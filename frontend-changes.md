@@ -1,7 +1,7 @@
-# Frontend Changes - Code Quality and Testing Infrastructure
+# Frontend Changes - Complete Implementation Documentation
 
 ## Overview
-This document outlines two major infrastructure improvements to the RAG chatbot codebase: code quality tools implementation and comprehensive testing framework enhancement.
+This document outlines three major improvements to the RAG chatbot: code quality tools implementation, comprehensive testing framework enhancement, and dark/light theme toggle feature.
 
 ## Part 1: Code Quality Tools Implementation
 
@@ -77,6 +77,90 @@ This document outlines two major infrastructure improvements to the RAG chatbot 
 - **Request Validation Tests**: Input validation and error handling
 - **Sequential Request Tests**: Multiple request handling and session management
 
+## Part 3: Dark/Light Theme Toggle Implementation
+
+### Files Modified
+
+#### 1. `index.html`
+**Changes:**
+- **Header Structure**: Restructured the header to be visible and contain both title content and theme toggle
+- **Theme Toggle Button**: Added a toggle button with dual SVG icons (sun/moon) positioned in the top-right
+- **Accessibility**: Included proper ARIA labels and title attributes for screen readers
+
+**New Elements:**
+```html
+<div class="header-content">
+    <div class="header-text">
+        <h1>Course Materials Assistant</h1>
+        <p class="subtitle">Ask questions about courses, instructors, and content</p>
+    </div>
+    <button id="themeToggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle between dark and light theme">
+        <!-- Sun and Moon SVG icons -->
+    </button>
+</div>
+```
+
+#### 2. `style.css`
+**Changes:**
+- **Light Theme Variables**: Added complete set of CSS custom properties for light theme
+- **Theme Toggle Button Styling**: Implemented animated button with hover and focus states
+- **Icon Animation**: Created smooth rotation and fade transitions for theme icons
+- **Header Visibility**: Made header visible and properly styled with flexbox layout
+- **Universal Transitions**: Added smooth transitions for all theme-related properties
+- **Responsive Design**: Updated mobile breakpoints to accommodate theme toggle
+
+**Key Features:**
+- **CSS Variables for Dark Theme** (default):
+  - Background: `#0f172a` (dark slate)
+  - Surface: `#1e293b` (lighter dark)
+  - Text: `#f1f5f9` (light gray)
+  
+- **CSS Variables for Light Theme**:
+  - Background: `#ffffff` (white)
+  - Surface: `#f8fafc` (light gray)
+  - Text: `#1e293b` (dark slate)
+
+- **Smooth Transitions**: 0.3s ease transitions for all color properties
+- **Icon Animation**: Rotating and scaling effects when switching themes
+
+#### 3. `script.js`
+**Changes:**
+- **Theme Management Functions**: Added complete theme switching logic
+- **Local Storage**: Persistent theme preference storage
+- **Accessibility Updates**: Dynamic ARIA label updates based on current theme
+- **Keyboard Support**: Enter and Space key support for theme toggle
+- **DOM Element**: Added themeToggle to DOM elements list
+- **Initialization**: Theme initialization on page load
+
+**New Functions:**
+```javascript
+initializeTheme()     // Load saved theme preference
+toggleTheme()         // Switch between themes
+updateThemeToggleAria() // Update accessibility attributes
+```
+
+### User Experience Features
+
+#### 1. **Toggle Button Design**
+- **Position**: Top-right corner of header for easy access
+- **Icons**: Sun icon for light theme, moon icon for dark theme
+- **Animation**: Smooth rotation and scaling transitions (0.3s ease)
+- **Hover Effects**: Border color change and slight scale increase
+- **Focus States**: Clear focus ring for keyboard navigation
+
+#### 2. **Theme Switching**
+- **Smooth Transitions**: All colors transition smoothly over 0.3s
+- **Instant Response**: Theme changes immediately on click
+- **Persistent**: Theme preference remembered across sessions
+- **System Integration**: Respects user's initial preference
+
+#### 3. **Accessibility Compliance**
+- **ARIA Labels**: Dynamic labels based on current theme state
+- **Keyboard Support**: Full keyboard navigation (Tab, Enter, Space)
+- **Focus Indicators**: Clear focus states for all interactive elements
+- **Color Contrast**: Both themes maintain high contrast ratios
+- **Screen Reader Support**: Proper semantic structure and labels
+
 ## Developer Workflow Integration
 
 ### Daily Development
@@ -89,16 +173,6 @@ Run `python scripts/check.py` and `uv run pytest tests/` to ensure code quality 
 
 ### CI/CD Ready
 All scripts return proper exit codes for integration with automated testing pipelines.
-
-## Testing Benefits for Frontend Development
-
-While no frontend code was changed, these testing enhancements provide significant benefits for frontend development:
-
-1. **API Contract Validation**: Tests ensure API endpoints behave consistently, giving frontend developers confidence in the API contract.
-2. **Error Handling Verification**: Tests validate that proper HTTP status codes and error messages are returned, helping frontend error handling logic.
-3. **Response Structure Assurance**: Tests verify that API responses match expected schemas, preventing frontend integration issues.
-4. **Session Management Validation**: Tests ensure session-based conversation flow works correctly for the chat interface.
-5. **CORS Configuration Testing**: Validates that the frontend can successfully make cross-origin requests to the API.
 
 ## Running Commands
 
@@ -131,7 +205,8 @@ uv run pytest tests/ -v
 - ✅ Codebase formatted with Black
 - ✅ Development scripts created and tested
 - ✅ Comprehensive API testing framework implemented
+- ✅ Dark/Light theme toggle implemented with full accessibility
 - ✅ Documentation updated
 - ⚠️  Some linting issues remain (imports, unused variables) - these can be addressed in future iterations
 
-The code quality and testing foundation is now in place and ready for regular use in the development workflow.
+The complete development infrastructure including code quality tools, testing framework, and user interface enhancements are now in place and ready for regular use in the development workflow.

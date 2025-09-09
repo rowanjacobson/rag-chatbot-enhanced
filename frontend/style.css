@@ -24,6 +24,30 @@
     --welcome-border: #2563eb;
 }
 
+/* Light Theme Variables */
+[data-theme="light"] {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --background: #ffffff;
+    --surface: #f8fafc;
+    --surface-hover: #f1f5f9;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --user-message: #2563eb;
+    --assistant-message: #f1f5f9;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+    --focus-ring: rgba(37, 99, 235, 0.2);
+    --welcome-bg: #f0f9ff;
+    --welcome-border: #2563eb;
+}
+
+/* Smooth transitions for theme switching */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
 /* Base Styles */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -46,9 +70,25 @@ body {
     padding: 0;
 }
 
-/* Header - Hidden */
+/* Header */
 header {
-    display: none;
+    padding: 1rem 2rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column;
 }
 
 header h1 {
@@ -705,6 +745,79 @@ details[open] .suggested-header::before {
     transform: translateX(2px);
 }
 
+/* Theme Toggle Button */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--background);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-toggle:hover {
+    border-color: var(--primary-color);
+    background: var(--surface-hover);
+    transform: scale(1.05);
+}
+
+.theme-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Theme Icon Animation */
+.theme-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+/* Default (dark theme) - show moon icon */
+.sun-icon {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(180deg) scale(0.8);
+}
+
+.moon-icon {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
+
+/* Light theme - show sun icon */
+[data-theme="light"] .sun-icon {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .moon-icon {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-180deg) scale(0.8);
+}
+
+/* Code blocks for light theme */
+[data-theme="light"] .message-content code {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .message-content pre {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .main-content {
@@ -745,8 +858,19 @@ details[open] .suggested-header::before {
         padding: 1rem;
     }
     
-    header h1 {
+    .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .header-text h1 {
         font-size: 1.5rem;
+    }
+    
+    .theme-toggle {
+        width: 40px;
+        height: 40px;
     }
     
     .chat-messages {
