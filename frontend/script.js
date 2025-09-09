@@ -5,7 +5,7 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton = document.getElementById('sendButton');
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
+    newChatButton = document.getElementById('newChatButton');
     
     setupEventListeners();
     createNewSession();
@@ -29,6 +30,8 @@ function setupEventListeners() {
         if (e.key === 'Enter') sendMessage();
     });
     
+    // New chat button
+    newChatButton.addEventListener('click', startNewChat);
     
     // Suggested questions
     document.querySelectorAll('.suggested-item').forEach(button => {
@@ -68,10 +71,24 @@ async function sendMessage() {
             body: JSON.stringify({
                 query: query,
                 session_id: currentSessionId
-            })
+            }),
+            // Add timeout to prevent hanging requests
+            signal: AbortSignal.timeout(60000) // 60 second timeout
         });
 
-        if (!response.ok) throw new Error('Query failed');
+        if (!response.ok) {
+            // Get detailed error information
+            let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+            try {
+                const errorData = await response.text();
+                if (errorData) {
+                    errorMessage += ` - ${errorData}`;
+                }
+            } catch (e) {
+                // If we can't read the error response, use the basic error
+            }
+            throw new Error(errorMessage);
+        }
 
         const data = await response.json();
         
@@ -85,9 +102,23 @@ async function sendMessage() {
         addMessage(data.answer, 'assistant', data.sources);
 
     } catch (error) {
-        // Replace loading message with error
+        // Replace loading message with detailed error
         loadingMessage.remove();
-        addMessage(`Error: ${error.message}`, 'assistant');
+        
+        // Provide more specific error messages
+        let errorMessage;
+        if (error.name === 'AbortError') {
+            errorMessage = 'Request timed out. Please try again with a shorter question.';
+        } else if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('HTTP 500')) {
+            errorMessage = 'Server error. The AI service may be temporarily unavailable.';
+        } else {
+            errorMessage = `Error: ${error.message}`;
+        }
+        
+        addMessage(errorMessage, 'assistant');
+        console.error('Query error details:', error);
     } finally {
         chatInput.disabled = false;
         sendButton.disabled = false;
@@ -122,10 +153,29 @@ function addMessage(content, type, sources = null, isWelcome = false) {
     let html = `<div class="message-content">${displayContent}</div>`;
     
     if (sources && sources.length > 0) {
+        const sourcesHtml = sources.map((source, index) => {
+            let sourceElement;
+            // Handle both old string format and new object format for backward compatibility
+            if (typeof source === 'string') {
+                sourceElement = `<span class="source-text">${source}</span>`;
+            } else if (source.text) {
+                // New object format with optional link
+                if (source.link) {
+                    sourceElement = `<a href="${source.link}" target="_blank" class="source-link">${source.text}</a>`;
+                } else {
+                    sourceElement = `<span class="source-text">${source.text}</span>`;
+                }
+            } else {
+                sourceElement = '<span class="source-text">Unknown source</span>';
+            }
+            
+            return sourceElement;
+        }).join(' ');
+        
         html += `
             <details class="sources-collapsible">
                 <summary class="sources-header">Sources</summary>
-                <div class="sources-content">${sources.join(', ')}</div>
+                <div class="sources-content">${sourcesHtml}</div>
             </details>
         `;
     }
@@ -150,6 +200,21 @@ async function createNewSession() {
     currentSessionId = null;
     chatMessages.innerHTML = '';
     addMessage('Welcome to the Course Materials Assistant! I can help you with questions about courses, lessons and specific content. What would you like to know?', 'assistant', null, true);
+}
+
+function startNewChat() {
+    // Clear current session
+    currentSessionId = null;
+    
+    // Clear chat messages
+    chatMessages.innerHTML = '';
+    
+    // Add welcome message
+    addMessage('Welcome to the Course Materials Assistant! I can help you with questions about courses, lessons and specific content. What would you like to know?', 'assistant', null, true);
+    
+    // Clear and focus input
+    chatInput.value = '';
+    chatInput.focus();
 }
 
 // Load course statistics

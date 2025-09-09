@@ -108,6 +108,16 @@ class VectorStore:
             )
             
             if results['documents'][0] and results['metadatas'][0]:
+                # Check if the match is reasonable by looking at the distance
+                # ChromaDB returns distances - lower is better match
+                if results['distances'] and results['distances'][0]:
+                    distance = results['distances'][0][0]
+                    # If distance is too high, it's probably not a real match
+                    # Threshold of 1.6 allows partial matches but rejects random text
+                    # Increased from 1.5 to handle common abbreviations like "MCP"
+                    if distance > 1.6:
+                        return None
+                
                 # Return the title (which is now the ID)
                 return results['metadatas'][0][0]['title']
         except Exception as e:
@@ -264,4 +274,5 @@ class VectorStore:
             return None
         except Exception as e:
             print(f"Error getting lesson link: {e}")
+            return None
     
