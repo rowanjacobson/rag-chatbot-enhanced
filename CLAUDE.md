@@ -14,6 +14,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Environment: Copy `.env.example` to `.env` and add `ANTHROPIC_API_KEY=your_key`
 - Prerequisites: Python 3.13+, uv package manager, Anthropic API key
 
+### Code Quality Tools
+- Format code: `python scripts/format.py` (uses Black for automatic formatting)
+- Check linting: `python scripts/lint.py` (uses flake8 for style checking)
+- Run all checks: `python scripts/check.py` (format check + linting)
+- Manual commands:
+  - `uv run black .` - Format all Python files
+  - `uv run black . --check` - Check formatting without changes
+  - `uv run flake8 .` - Run linting checks
+
 ## Architecture Overview
 
 ### Core System Design
